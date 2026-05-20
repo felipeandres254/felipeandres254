@@ -2,9 +2,6 @@
 .DS_Store
 Thumbs.db
 
-# VSCode local
-.vscode/settings.json
-
 # Logs
 *.log
 

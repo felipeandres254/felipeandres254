@@ -1,6 +1,6 @@
-# Hi, I'm Andres 👋
+# Hi, I'm Andrés 👋
 
-Full-stack developer based in Gold Coast, Australia. I build web platforms, automation tools, and infrastructure that gets out of my way.
+Software engineer based in Gold Coast, Australia. I build web platforms, automation tools, and infrastructure that gets out of my way.
 
 ## What I work with
 

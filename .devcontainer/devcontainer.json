@@ -8,18 +8,50 @@
 
   // Features to add to the dev container. More info: https://containers.dev/features.
   "features": {
-    "ghcr.io/devcontainers/features/node:1": { "version": "20" },
+    "ghcr.io/devcontainers/features/node:2": { "version": "20" },
     "ghcr.io/devcontainers/features/git:1": { "version": "latest" },
     "ghcr.io/nils-geistmann/devcontainers-features/zsh:0": {},
-    "ghcr.io/devcontainers-extra/features/zsh-plugins:0": {}
+    "ghcr.io/devcontainers-extra/features/ts-node:1": {},
+    "ghcr.io/devcontainers-extra/features/zsh-plugins:0": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/devcontainers/features/aws-cli:1.1.4": {}
   },
 
   // Connect as vscode. More info: https://aka.ms/dev-containers-non-root.
   "remoteUser": "vscode",
 
+  // Configure tool-specific properties.
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "alefragnani.bookmarks",
+        "anthropic.claude-code",
+        "deerawan.vscode-hasher",
+        "eriklynd.json-tools",
+        "esbenp.prettier-vscode",
+        "espresso3389.unixtime-converter",
+        "jkjustjoshing.vscode-text-pastry",
+        "joelharkes.eml-email-viewer",
+        "lostfields.nodejs-repl",
+        "mhutchie.git-graph",
+        "nuxt.nuxtjs",
+        "oderwat.indent-rainbow",
+        "rahules.hash-utils",
+        "vue.volar",
+        "yy0931.vscode-sqlite3-editor"
+      ]
+    }
+  },
+
   "containerEnv": {
     "PNPM_HOME": "/home/vscode/.local/share/pnpm"
   },
+
+  "mounts": [
+    "source=${localWorkspaceFolder}/.devcontainer/.gitconfig,target=/home/vscode/.gitconfig,type=bind,consistency=cached",
+    "source=${localWorkspaceFolder}/.devcontainer/zsh/.zshrc,target=/home/vscode/.zshrc,type=bind,consistency=cached",
+    "source=${localWorkspaceFolder}/.devcontainer/zsh/themes,target=/home/vscode/.oh-my-zsh/custom/themes,type=bind,consistency=cached"
+  ],
 
   // Post-create command to set up the environment.
   "postCreateCommand": "/bin/sh .devcontainer/bootstrap.sh"
