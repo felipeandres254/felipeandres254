@@ -55,6 +55,6 @@
   ],
 
   // Commands to set up and start the environment.
-  "postCreateCommand": "/bin/sh .devcontainer/bootstrap.sh",
-  "postStartCommand": "bash .devcontainer/start.sh"
+  "postCreateCommand": "/bin/sh .devcontainer/scripts/bootstrap.sh",
+  "postStartCommand": "/bin/sh .devcontainer/scripts/start.sh"
 }

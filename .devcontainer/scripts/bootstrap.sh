@@ -22,13 +22,19 @@ sudo apt install -y python3 python3-pip
 sudo apt install -y fonts-freefont-ttf fonts-liberation fonts-noto-color-emoji \
   fonts-wqy-zenhei libatk-bridge2.0-0 libatk1.0-0 libatspi2.0-0 libnspr4 libnss3 \
   libxcomposite1 libxdamage1 libxrandr2 libgbm1 libxkbcommon0
-python3 -m pip install -U "yt-dlp[default]" boto3 graphifyy opencv-python requests
+python3 -m pip install --break-system-packages \
+  requests "yt-dlp[default]" boto3 graphifyy opencv-python
 
 ###
-curl -fsSL https://claude.ai/install.sh | bash
+curl -fsSL https://opencode.ai/install | bash
+graphify install --platform opencode
 
 ###
 mkdir -p ~/.ssh
 chmod 700 ~/.ssh
+
+# Restore private files from S3 (if configured)
+echo "\n${BLUE}${BOLD}=== Restoring private files from S3...${RESET}"
+/bin/bash /workspaces/felipeandres254/.devcontainer/scripts/backup.sh --restore
 
 echo "\n${GREEN}${BOLD}=== Bootstrap script completed successfully!${RESET}"

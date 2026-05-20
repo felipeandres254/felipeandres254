@@ -2,7 +2,7 @@
   "diffEditor.ignoreTrimWhitespace": false,
   "diffEditor.renderSideBySide": true,
   "editor.fontSize": 16,
-  "editor.formatOnSave": true,
+  "editor.formatOnSave": false,
   "editor.renderWhitespace": "all",
   "editor.tabSize": 2,
   "explorer.confirmDelete": false,

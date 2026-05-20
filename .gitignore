@@ -18,6 +18,16 @@ __pycache__/
 *.key
 *.p12
 
+# Artifacts
+.devcontainer/devcontainer-lock.json
+
+# Opencode configuration
+.opencode/
+!.opencode/plugins/
+graphify-out/
+AGENTS.md
+
 # Projects and repositories
 projects/
 !projects/.gitkeep
+.s3backup
