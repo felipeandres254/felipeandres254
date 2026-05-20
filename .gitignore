@@ -20,3 +20,7 @@ __pycache__/
 *.pem
 *.key
 *.p12
+
+# Projects and repositories
+projects/
+!projects/.gitkeep
