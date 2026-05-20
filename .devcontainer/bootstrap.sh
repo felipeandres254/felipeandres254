@@ -16,9 +16,9 @@ echo "\n${GREEN}${BOLD}=== Running post create tasks...${RESET}"
 sudo apt update
 sudo apt upgrade -y
 sudo apt install -y build-essential software-properties-common
+sudo apt install -y git cron bc curl wget zip unzip
+sudo apt install -y xvfb xauth imagemagick ffmpeg jq sqlite3
 sudo apt install -y python3 python3-pip
-sudo apt install -y bc curl wget zip unzip imagemagick ffmpeg jq sqlite3
-sudo apt install -y xvfb xauth
 sudo apt install -y fonts-freefont-ttf fonts-liberation fonts-noto-color-emoji \
   fonts-wqy-zenhei libatk-bridge2.0-0 libatk1.0-0 libatspi2.0-0 libnspr4 libnss3 \
   libxcomposite1 libxdamage1 libxrandr2 libgbm1 libxkbcommon0

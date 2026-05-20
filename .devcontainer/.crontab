@@ -1,0 +1,6 @@
+#
+ROOT=/workspaces/felipeandres254
+
+*    *    *    *    *    crontab ${ROOT}/.devcontainer/.crontab
+
+# *    *    *    *    *    mkdir -p ${ROOT}/logs && date >> ${ROOT}/logs/cron-date.log

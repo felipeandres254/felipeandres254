@@ -30,6 +30,7 @@
         "eriklynd.json-tools",
         "esbenp.prettier-vscode",
         "espresso3389.unixtime-converter",
+        "hogashi.crontab-syntax-highlight",
         "jkjustjoshing.vscode-text-pastry",
         "joelharkes.eml-email-viewer",
         "lostfields.nodejs-repl",
@@ -53,6 +54,7 @@
     "source=${localWorkspaceFolder}/.devcontainer/zsh/themes,target=/home/vscode/.oh-my-zsh/custom/themes,type=bind,consistency=cached"
   ],
 
-  // Post-create command to set up the environment.
-  "postCreateCommand": "/bin/sh .devcontainer/bootstrap.sh"
+  // Commands to set up and start the environment.
+  "postCreateCommand": "/bin/sh .devcontainer/bootstrap.sh",
+  "postStartCommand": "bash .devcontainer/start.sh"
 }
