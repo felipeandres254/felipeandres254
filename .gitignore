@@ -19,6 +19,7 @@ __pycache__/
 *.p12
 
 # Artifacts
+.backup-cache/
 .devcontainer/devcontainer-lock.json
 
 # Opencode configuration

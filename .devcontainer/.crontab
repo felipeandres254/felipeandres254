@@ -7,4 +7,4 @@ ROOT=/workspaces/felipeandres254
 */5  *    *    *    *    [ -f ${ROOT}/.backup-restore-pending ] && /bin/sh ${ROOT}/.devcontainer/scripts/backup.sh --retry-restore >/dev/null 2>&1
 
 # Upload private files to S3 every 5 minutes
-*/5 *    *    *    *    /bin/sh ${ROOT}/.devcontainer/scripts/backup.sh >/dev/null 2>&1
+*/5  *    *    *    *    /bin/sh ${ROOT}/.devcontainer/scripts/backup.sh >/dev/null 2>&1
