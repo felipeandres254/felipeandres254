@@ -10,5 +10,6 @@
   "workbench.colorTheme": "Monokai",
   "workbench.iconTheme": "vscode-icons",
   "workbench.tree.indent": 15,
-  "git-graph.maxDepthOfRepoSearch": 1,
+  "git-graph.maxDepthOfRepoSearch": 2,
+  "git.repositoryScanMaxDepth": 2
 }

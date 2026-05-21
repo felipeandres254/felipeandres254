@@ -25,7 +25,6 @@
     "vscode": {
       "extensions": [
         "alefragnani.bookmarks",
-        "anthropic.claude-code",
         "deerawan.vscode-hasher",
         "eriklynd.json-tools",
         "esbenp.prettier-vscode",
@@ -38,6 +37,7 @@
         "nuxt.nuxtjs",
         "oderwat.indent-rainbow",
         "rahules.hash-utils",
+        "sst-dev.opencode",
         "vue.volar",
         "yy0931.vscode-sqlite3-editor"
       ]
