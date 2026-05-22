@@ -7,6 +7,8 @@ Thumbs.db
 
 # Node
 node_modules/
+.pnpm-store/
+pnpm-lock.yaml
 
 # Python
 __pycache__/
@@ -30,6 +32,7 @@ graphify-out/
 AGENTS.md
 
 # Projects and repositories
+.tmp/
 projects/
 !projects/.gitkeep
 .s3backup
