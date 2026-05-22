@@ -36,12 +36,12 @@ CURRENT_BG='NONE'
 
 case ${SOLARIZED_THEME:-dark} in
     light)
-      CURRENT_FG='white'
-      CURRENT_DEFAULT_FG='white'
+      CURRENT_FG=${CURRENT_FG:-'white'}
+      CURRENT_DEFAULT_FG=${CURRENT_DEFAULT_FG:-'white'}
       ;;
     *)
-      CURRENT_FG='black'
-      CURRENT_DEFAULT_FG='default'
+      CURRENT_FG=${CURRENT_FG:-'black'}
+      CURRENT_DEFAULT_FG=${CURRENT_DEFAULT_FG:-'default'}
       ;;
 esac
 
@@ -165,7 +165,7 @@ git_toplevel() {
 # Context: user@hostname (who am I and where am I)
 prompt_context() {
   if [[ "$USERNAME" != "$DEFAULT_USER" || -n "$SSH_CLIENT" ]]; then
-    prompt_segment black default "%(!.%{%F{yellow}%}.)%n"
+    prompt_segment "$AGNOSTER_CONTEXT_BG" "$AGNOSTER_CONTEXT_FG" "%(!.%{%F{$AGNOSTER_STATUS_ROOT_FG}%}.)%n"
   fi
 }
 
@@ -304,11 +304,19 @@ prompt_hg() {
 
 # Dir: current working directory
 prompt_dir() {
-  prompt_segment blue $CURRENT_FG '%1~'
+  if [[ $AGNOSTER_GIT_INLINE == 'true' ]] && $(git rev-parse --is-inside-work-tree >/dev/null 2>&1); then
+    # Git repo and inline path enabled, hence only show the git root
+    prompt_segment "$AGNOSTER_DIR_BG" "$AGNOSTER_DIR_FG" "$(git_toplevel | sed "s:^$HOME:~:")"
+  else
+    prompt_segment "$AGNOSTER_DIR_BG" "$AGNOSTER_DIR_FG" '%1~'
+  fi
 }
 
 # Virtualenv: current working virtualenv
 prompt_virtualenv() {
+  if [ -n "$CONDA_DEFAULT_ENV" ]; then
+    prompt_segment magenta $CURRENT_FG "🐍 $CONDA_DEFAULT_ENV"
+  fi
   if [[ -n "$VIRTUAL_ENV" && -n "$VIRTUAL_ENV_DISABLE_PROMPT" ]]; then
     prompt_segment "$AGNOSTER_VENV_BG" "$AGNOSTER_VENV_FG" "(${VIRTUAL_ENV:t:gs/%/%%})"
   fi
@@ -345,12 +353,19 @@ prompt_aws() {
   esac
 }
 
+prompt_terraform() {
+  local terraform_info=$(tf_prompt_info)
+  [[ -z "$terraform_info" ]] && return
+  prompt_segment magenta yellow "TF: $terraform_info"
+}
+
 ## Main prompt
 build_prompt() {
   RETVAL=$?
   prompt_status
   prompt_virtualenv
   prompt_aws
+  prompt_terraform
   prompt_context
   prompt_dir
   prompt_git
