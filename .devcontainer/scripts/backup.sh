@@ -29,6 +29,9 @@ set -eu
 #   Once restore succeeds the flag is removed and retry stops.
 # ──────────────────────────────────────────────────────────────────
 
+# Ensure /usr/local/bin is on PATH (needed for cron which has a minimal PATH)
+export PATH="/usr/local/bin:$PATH"
+
 WORKSPACE="${WORKSPACE:-/workspaces/felipeandres254}"
 S3BACKUP="$WORKSPACE/.s3backup"
 RESTORE_PENDING="$WORKSPACE/.backup-restore-pending"
@@ -59,6 +62,18 @@ has_credentials() {
 do_upload() {
   [ -f "$S3BACKUP" ] || { echo "No .s3backup — nothing to upload."; exit 0; }
   mkdir -p "$CACHEDIR"
+
+  # Snapshot opencode session db + skills into workspace so .s3backup picks them up
+  OCODE_DB="$HOME/.local/share/opencode"
+  if [ -d "$OCODE_DB" ]; then
+    mkdir -p "$WORKSPACE/.opencode"
+    cp "$OCODE_DB"/opencode.db* "$WORKSPACE/.opencode/" 2>/dev/null || true
+  fi
+  OCODE_SKILLS="$HOME/.config/opencode/skills"
+  if [ -d "$OCODE_SKILLS" ]; then
+    mkdir -p "$WORKSPACE/.opencode/skills"
+    rsync -a "$OCODE_SKILLS/" "$WORKSPACE/.opencode/skills/"
+  fi
 
   echo "Syncing to ${S3_BASE}"
 
@@ -117,6 +132,21 @@ do_restore() {
 
   # Restore clears mtime cache — next upload re-uploads as needed
   rm -rf "$CACHEDIR"
+
+  # Restore opencode session db + skills from workspace back to their homes
+  OCODE_DB="$HOME/.local/share/opencode"
+  if [ -f "$WORKSPACE/.opencode/opencode.db" ]; then
+    mkdir -p "$OCODE_DB"
+    cp "$WORKSPACE/.opencode/opencode.db"* "$OCODE_DB/" 2>/dev/null || true
+    echo "  ✓  opencode session db restored"
+  fi
+  OCODE_SKILLS_TARGET="$HOME/.config/opencode/skills"
+  if [ -d "$WORKSPACE/.opencode/skills" ]; then
+    mkdir -p "$OCODE_SKILLS_TARGET"
+    rsync -a "$WORKSPACE/.opencode/skills/" "$OCODE_SKILLS_TARGET/"
+    echo "  ✓  skills restored"
+  fi
+
   echo "Restore complete — ${S3_BASE}"
 }
 
