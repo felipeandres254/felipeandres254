@@ -23,7 +23,7 @@ sudo apt install -y fonts-freefont-ttf fonts-liberation fonts-noto-color-emoji \
   fonts-wqy-zenhei libatk-bridge2.0-0 libatk1.0-0 libatspi2.0-0 libnspr4 libnss3 \
   libxcomposite1 libxdamage1 libxrandr2 libgbm1 libxkbcommon0
 python3 -m pip install --break-system-packages \
-  requests "yt-dlp[default]" boto3 graphifyy opencv-python
+  requests "yt-dlp[default]" boto3 graphifyy opencv-python openai-whisper
 
 ###
 curl -fsSL https://opencode.ai/install | bash

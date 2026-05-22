@@ -1,10 +1,12 @@
 #
 ROOT=/workspaces/felipeandres254
+LOGS=/workspaces/felipeandres254/_logs
 
-*    *    *    *    *    crontab ${ROOT}/.devcontainer/.crontab
+*    *    *    *    *    mkdir -p ${LOGS} && crontab ${ROOT}/.devcontainer/.crontab
+0    0    *    *    *    mkdir -p ${LOGS} && find ${LOGS} -name '*.log' -mtime +7 -delete
 
 # Retry S3 restore every 5 minutes when pending (local devcontainer without secrets)
-*/5  *    *    *    *    [ -f ${ROOT}/.backup-restore-pending ] && /bin/sh ${ROOT}/.devcontainer/scripts/backup.sh --retry-restore >/dev/null 2>&1
+*/5  *    *    *    *    mkdir -p ${LOGS} && [ -f ${ROOT}/.backup-restore-pending ] && /bin/sh ${ROOT}/.devcontainer/scripts/backup.sh --retry-restore >>${LOGS}/retry-restore-$(date +\%Y\%m\%d).log 2>&1
 
 # Upload private files to S3 every 5 minutes
-*/5  *    *    *    *    /bin/sh ${ROOT}/.devcontainer/scripts/backup.sh >/dev/null 2>&1
+*/5  *    *    *    *    mkdir -p ${LOGS} && /bin/sh ${ROOT}/.devcontainer/scripts/backup.sh >>${LOGS}/backup-$(date +\%Y\%m\%d).log 2>&1
