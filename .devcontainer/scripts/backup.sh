@@ -32,6 +32,11 @@ set -eu
 # Ensure /usr/local/bin is on PATH (needed for cron which has a minimal PATH)
 export PATH="/usr/local/bin:$PATH"
 
+# AWS CLI timeout — prevents hangs on network/credential issues
+_CLI_READ_TIMEOUT="${CLI_READ_TIMEOUT:-30}"
+_CLI_CONNECT_TIMEOUT="${CLI_CONNECT_TIMEOUT:-10}"
+_AWS="aws --cli-read-timeout $_CLI_READ_TIMEOUT --cli-connect-timeout $_CLI_CONNECT_TIMEOUT"
+
 WORKSPACE="${WORKSPACE:-/workspaces/felipeandres254}"
 S3BACKUP="$WORKSPACE/.s3backup"
 RESTORE_PENDING="$WORKSPACE/.backup-restore-pending"
@@ -63,6 +68,8 @@ do_upload() {
   [ -f "$S3BACKUP" ] || { echo "No .s3backup — nothing to upload."; exit 0; }
   mkdir -p "$CACHEDIR"
 
+  TOTAL_START=$(date +%s)
+
   # Snapshot opencode session db + skills into workspace so .s3backup picks them up
   OCODE_DB="$HOME/.local/share/opencode"
   if [ -d "$OCODE_DB" ]; then
@@ -77,6 +84,10 @@ do_upload() {
 
   echo "Syncing to ${S3_BASE}"
 
+  MANIFEST_FILE="$CACHEDIR/.manifest"
+  MANIFEST_NEXT="$CACHEDIR/.manifest.next"
+  : > "$MANIFEST_NEXT"
+
   while IFS= read -r LINE; do
     LINE=${LINE%%#*}
     LINE=$(echo "$LINE" | xargs)
@@ -86,16 +97,21 @@ do_upload() {
       [ -e "$MATCH" ] || continue
       REL=${MATCH#"$WORKSPACE/"}
       REL=${REL%/}
+
+      ITEM_START=$(date +%s)
+
       if [ -d "$MATCH" ]; then
-        aws s3 sync "$MATCH" "${S3_BASE}${REL}/" --quiet && echo "  ✓  $REL/"
+        $_AWS s3 sync "$MATCH" "${S3_BASE}${REL}/" --delete --quiet && \
+          echo "  ✓  $REL/  ($(($(date +%s) - ITEM_START))s)"
       elif [ -f "$MATCH" ]; then
+        echo "$REL" >> "$MANIFEST_NEXT"
         CACHEKEY=$(echo "$REL" | md5sum - 2>/dev/null | cut -d' ' -f1 || echo "$REL")
         CACHED_MTIME=$(cat "$CACHEDIR/$CACHEKEY" 2>/dev/null || echo "0")
         CURRENT_MTIME=$(stat -c %Y "$MATCH" 2>/dev/null || echo "0")
         if [ "$CURRENT_MTIME" != "$CACHED_MTIME" ]; then
-          aws s3 cp "$MATCH" "${S3_BASE}${REL}" --quiet && \
+          $_AWS s3 cp "$MATCH" "${S3_BASE}${REL}" --quiet && \
             echo "$CURRENT_MTIME" > "$CACHEDIR/$CACHEKEY" && \
-            echo "  ✓  $REL"
+            echo "  ✓  $REL  ($(($(date +%s) - ITEM_START))s)"
         else
           echo "  -  $REL  (unchanged)"
         fi
@@ -103,7 +119,25 @@ do_upload() {
     done
   done < "$S3BACKUP"
 
-  echo "Done — ${S3_BASE}"
+  # ── Cleanup pass: delete stale singleton files from S3 ──────────
+  # Compare this run's manifest against the previous run's manifest.
+  # Any file in the old manifest but not in the current one was removed locally.
+  if [ -f "$MANIFEST_FILE" ]; then
+    while IFS= read -r STALE; do
+      [ -n "$STALE" ] || continue
+      ITEM_START=$(date +%s)
+      if $_AWS s3 rm "${S3_BASE}${STALE}" --quiet 2>/dev/null; then
+        CACHEKEY=$(echo "$STALE" | md5sum - 2>/dev/null | cut -d' ' -f1)
+        [ -n "$CACHEKEY" ] && rm -f "$CACHEDIR/$CACHEKEY"
+        echo "  ✗  $STALE  (stale)  ($(($(date +%s) - ITEM_START))s)"
+      fi
+    done <<STALE_EOF
+$(grep -v -x -F -f "$MANIFEST_NEXT" "$MANIFEST_FILE" || true)
+STALE_EOF
+  fi
+  mv "$MANIFEST_NEXT" "$MANIFEST_FILE"
+
+  echo "Done — ${S3_BASE}  (total: $(($(date +%s) - TOTAL_START))s)"
 }
 
 # ── Restore ───────────────────────────────────────────────────────
@@ -122,10 +156,10 @@ do_restore() {
       REL=${MATCH#"$WORKSPACE/"}
       DEST="$MATCH"
       SRC="${S3_BASE}${REL}"
-      if aws s3 ls "${SRC}/" >/dev/null 2>&1; then
-        aws s3 sync "${SRC}/" "${DEST}/" --quiet && echo "  ✓  ${REL}/  restored"
-      elif aws s3 ls "${SRC}" >/dev/null 2>&1; then
-        aws s3 cp "${SRC}" "${DEST}" --quiet && echo "  ✓  ${REL}  restored"
+      if $_AWS s3 ls "${SRC}/" >/dev/null 2>&1; then
+        $_AWS s3 sync "${SRC}/" "${DEST}/" --quiet && echo "  ✓  ${REL}/  restored"
+      elif $_AWS s3 ls "${SRC}" >/dev/null 2>&1; then
+        $_AWS s3 cp "${SRC}" "${DEST}" --quiet && echo "  ✓  ${REL}  restored"
       fi
     done
   done < "$S3BACKUP"
