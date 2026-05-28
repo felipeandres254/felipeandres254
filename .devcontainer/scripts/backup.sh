@@ -82,7 +82,7 @@ do_upload() {
     rsync -a "$OCODE_SKILLS/" "$WORKSPACE/.opencode/skills/"
   fi
 
-  echo "Syncing to ${S3_BASE}"
+  echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] Syncing to ${S3_BASE}"
 
   MANIFEST_FILE="$CACHEDIR/.manifest"
   MANIFEST_NEXT="$CACHEDIR/.manifest.next"
@@ -194,21 +194,25 @@ case "$MODE" in
       touch "$RESTORE_PENDING"
       echo "AWS credentials not available. Retry scheduled via crontab."
     fi
+    echo; exit 0;
     ;;
   --retry-restore)
     if has_credentials; then
       do_restore
       rm -f "$RESTORE_PENDING"
     fi
+    echo; exit 0;
     ;;
   upload|--upload|-u)
     if ! has_credentials; then
-      echo "No AWS credentials — skipping upload."; exit 0
+      echo "No AWS credentials — skipping upload.";
+      echo; exit 0;
     fi
     do_upload
+    echo; exit 0;
     ;;
   *)
     echo "Usage: $0 [--restore|upload]" >&2
-    exit 1
+    echo; exit 1;
     ;;
 esac

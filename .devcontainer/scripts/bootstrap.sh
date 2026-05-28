@@ -37,4 +37,9 @@ chmod 700 ~/.ssh
 echo "\n${BLUE}${BOLD}=== Restoring private files from S3...${RESET}"
 /bin/bash /workspaces/felipeandres254/.devcontainer/scripts/backup.sh --restore
 
+# Symlink workspace .opencode to global config so opencode always loads from here
+echo "\n${BLUE}${BOLD}=== Linking opencode global config to workspace...${RESET}"
+rm -rf ~/.config/opencode
+ln -sf /workspaces/felipeandres254/.opencode ~/.config/opencode
+
 echo "\n${GREEN}${BOLD}=== Bootstrap script completed successfully!${RESET}"
