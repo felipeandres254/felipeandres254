@@ -70,12 +70,13 @@ do_upload() {
 
   TOTAL_START=$(date +%s)
 
-  # Snapshot opencode session db + skills into workspace so .s3backup picks them up
-  OCODE_DB="$HOME/.local/share/opencode"
-  if [ -d "$OCODE_DB" ]; then
-    mkdir -p "$WORKSPACE/.opencode"
-    cp "$OCODE_DB"/opencode.db* "$WORKSPACE/.opencode/" 2>/dev/null || true
+  # S3 sync picks up .opencode/opencode.db* via .s3backup glob -- no copy needed
+  WOKWI="$HOME/.wokwi"
+  if [ -d "$WOKWI" ]; then
+    mkdir -p "$WORKSPACE/.wokwi"
+    rsync -a "$WOKWI/" "$WORKSPACE/.wokwi/"
   fi
+
   OCODE_SKILLS="$HOME/.config/opencode/skills"
   if [ -d "$OCODE_SKILLS" ]; then
     mkdir -p "$WORKSPACE/.opencode/skills"
@@ -167,13 +168,20 @@ do_restore() {
   # Restore clears mtime cache — next upload re-uploads as needed
   rm -rf "$CACHEDIR"
 
-  # Restore opencode session db + skills from workspace back to their homes
-  OCODE_DB="$HOME/.local/share/opencode"
-  if [ -f "$WORKSPACE/.opencode/opencode.db" ]; then
-    mkdir -p "$OCODE_DB"
-    cp "$WORKSPACE/.opencode/opencode.db"* "$OCODE_DB/" 2>/dev/null || true
-    echo "  ✓  opencode session db restored"
+  # Restore Wokwi state from workspace copy to home
+  WOKWI_TARGET="$HOME/.wokwi"
+  if [ -d "$WORKSPACE/.wokwi" ]; then
+    mkdir -p "$WOKWI_TARGET"
+    rsync -a "$WORKSPACE/.wokwi/" "$WOKWI_TARGET/"
+    echo "  ✓  .wokwi/ restored"
   fi
+
+  # Ensure global opencode.db resolves to workspace (DB restored by S3 sync via .s3backup)
+  mkdir -p "$HOME/.local/share/opencode"
+  rm -f "$HOME/.local/share/opencode/opencode.db"
+  ln -sf "$WORKSPACE/.opencode/opencode.db" "$HOME/.local/share/opencode/opencode.db"
+  echo "  ✓  opencode session db linked"
+
   OCODE_SKILLS_TARGET="$HOME/.config/opencode/skills"
   if [ -d "$WORKSPACE/.opencode/skills" ]; then
     mkdir -p "$OCODE_SKILLS_TARGET"

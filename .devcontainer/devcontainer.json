@@ -36,9 +36,11 @@
         "mhutchie.git-graph",
         "nuxt.nuxtjs",
         "oderwat.indent-rainbow",
+        "platformio.platformio-ide",
         "rahules.hash-utils",
         "sst-dev.opencode",
         "vue.volar",
+        "wokwi.wokwi-vscode",
         "yy0931.vscode-sqlite3-editor"
       ]
     }

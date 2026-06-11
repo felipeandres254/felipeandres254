@@ -18,12 +18,13 @@ sudo apt upgrade -y
 sudo apt install -y build-essential software-properties-common
 sudo apt install -y git cron bc curl wget zip unzip
 sudo apt install -y xvfb xauth imagemagick ffmpeg jq sqlite3
-sudo apt install -y python3 python3-pip
+sudo apt install -y python3 python3-pip python3-venv
 sudo apt install -y fonts-freefont-ttf fonts-liberation fonts-noto-color-emoji \
   fonts-wqy-zenhei libatk-bridge2.0-0 libatk1.0-0 libatspi2.0-0 libnspr4 libnss3 \
   libxcomposite1 libxdamage1 libxrandr2 libgbm1 libxkbcommon0
 python3 -m pip install --break-system-packages \
-  requests "yt-dlp[default]" boto3 graphifyy opencv-python openai-whisper
+  requests "yt-dlp[default]" boto3 graphifyy opencv-python openai-whisper \
+  platformio
 
 ###
 curl -fsSL https://opencode.ai/install | bash
@@ -41,5 +42,8 @@ echo "\n${BLUE}${BOLD}=== Restoring private files from S3...${RESET}"
 echo "\n${BLUE}${BOLD}=== Linking opencode global config to workspace...${RESET}"
 rm -rf ~/.config/opencode
 ln -sf /workspaces/felipeandres254/.opencode ~/.config/opencode
+
+# Ensure Wokwi directory exists (full state restored from S3 backup)
+mkdir -p "$HOME/.wokwi"
 
 echo "\n${GREEN}${BOLD}=== Bootstrap script completed successfully!${RESET}"

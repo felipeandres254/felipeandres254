@@ -33,6 +33,7 @@ AGENTS.md
 
 # Projects and repositories
 .tmp/
+.wokwi/
 projects/
 !projects/.gitkeep
 .s3backup
