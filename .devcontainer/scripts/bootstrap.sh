@@ -27,12 +27,23 @@ python3 -m pip install --break-system-packages \
   platformio
 
 ###
+wget https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
+sudo dpkg -i cloudflared-linux-amd64.deb
+
+###
 curl -fsSL https://opencode.ai/install | bash
 graphify install --platform opencode
 
 ###
 mkdir -p ~/.ssh
 chmod 700 ~/.ssh
+
+# Install Playwright Chromium browser globally for $playwright DSL module
+echo "\n${BLUE}${BOLD}=== Installing Playwright CLI (global)...${RESET}"
+npm install -g playwright 2>&1
+
+echo "\n${BLUE}${BOLD}=== Installing Playwright Chromium browser...${RESET}"
+playwright install chromium 2>&1
 
 # Restore private files from S3 (if configured)
 echo "\n${BLUE}${BOLD}=== Restoring private files from S3...${RESET}"
@@ -42,6 +53,13 @@ echo "\n${BLUE}${BOLD}=== Restoring private files from S3...${RESET}"
 echo "\n${BLUE}${BOLD}=== Linking opencode global config to workspace...${RESET}"
 rm -rf ~/.config/opencode
 ln -sf /workspaces/felipeandres254/.opencode ~/.config/opencode
+
+# Ensure the workspace's opencode.db is the canonical DB (backed up to S3 via .s3backup)
+# and the global path resolves to it via symlink.
+echo "\n${BLUE}${BOLD}=== Linking global opencode DB to workspace .opencode/opencode.db...${RESET}"
+mkdir -p /home/vscode/.local/share/opencode
+rm -f /home/vscode/.local/share/opencode/opencode.db
+ln -sf /workspaces/felipeandres254/.opencode/opencode.db /home/vscode/.local/share/opencode/opencode.db
 
 # Ensure Wokwi directory exists (full state restored from S3 backup)
 mkdir -p "$HOME/.wokwi"

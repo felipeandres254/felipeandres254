@@ -105,10 +105,3 @@ source $ZSH/oh-my-zsh.sh
 
 # opencode
 export PATH=/home/vscode/.opencode/bin:$PATH
-# Always start opencode from workspace root so instructions/sessions resolve correctly
-function opencode() {
-  local orig="$(pwd)"
-  builtin cd /workspaces/felipeandres254
-  command opencode "$@"
-  builtin cd "$orig"
-}
